@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Fake Job Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav style="padding: 1.5rem 10%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <div style="font-weight: 800; font-size: 1.5rem; color: var(--primary);">FakeJob<span style="color: white;">Sheild</span></div>
+        <a href="/login" style="text-decoration: none; color: #94a3b8; font-weight: 600;"><i class="fas fa-lock"></i> ADMIN</a>
+    </nav>
+
+    <main style="max-width: 800px; margin: 4rem auto; width: 90%;">
+        <div class="glass-card" style="text-align: center;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 1rem; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Fake Job Detection</h1>
+            <p style="color: #94a3b8; margin-bottom: 2rem;">Paste the job description and let the AI analyze fraud patterns.</p>
+            
+            <form action="/predict" method="POST" id="mainForm">
+                <textarea name="job_description" placeholder="Paste content here..." style="width: 100%; height: 180px; background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 12px; color: white; padding: 1rem; margin-bottom: 1.5rem; resize: none;" required></textarea>
+                <button type="submit" class="glow-btn" id="predictBtn">Predict Now</button>
+            </form>
+
+            {% if prediction %}
+<div class="result-display {{ prediction.lower() }} animate-pop">
+    <div class="ring-container">
+        <svg class="progress-ring" width="120" height="120">
+            <circle class="progress-ring__background" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+            <circle class="progress-ring__circle" id="confidenceRing" 
+                    stroke="{% if prediction == 'Fake' %}#ef4444{% else %}#22c55e{% endif %}" 
+                    stroke-width="8" stroke-dasharray="326.7" stroke-dashoffset="326.7" 
+                    stroke-linecap="round" fill="transparent" r="52" cx="60" cy="60"/>
+        </svg>
+        <div class="percentage-label"><span id="percentNum">0</span>%</div>
+    </div>
+    
+    <div class="status-info">
+        <h2 style="margin:0;">Verdict: {{ prediction }}</h2>
+        <p style="margin:5px 0 0 0; opacity:0.7;">AI Fraud Analysis Score</p>
+    </div>
+</div>
+
+<div class="flag-zone animate-pop" style="margin-top: 30px;">
+    <div class="glass-card" style="padding: 20px; background: rgba(255,255,255,0.02);">
+        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 15px;">Incorrect prediction? Help improve the AI:</p>
+        
+        <form action="/flag" method="POST" style="display: flex; gap: 10px; justify-content: center; align-items: center;">
+            <input type="hidden" name="job_text" value="{{ original_text }}">
+            <input type="hidden" name="predicted_as" value="{{ prediction }}">
+            
+            <select name="reason" class="glass-input" style="margin: 0; width: 200px;" required>
+                <option value="" disabled selected>Select reason...</option>
+                <option value="Should be Fake">Actually a Scam</option>
+                <option value="Should be Real">Legitimate Job</option>
+            </select>
+            
+            <button type="submit" class="btn-report">Submit Report</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Confidence Ring Animation Logic
+    function animateConfidence(targetPercent) {
+        const circle = document.getElementById('confidenceRing');
+        const numberDisplay = document.getElementById('percentNum');
+        const circumference = 52 * 2 * Math.PI;
+        
+        const offset = circumference - (targetPercent / 100 * circumference);
+        
+        setTimeout(() => {
+            circle.style.transition = 'stroke-dashoffset 2s cubic-bezier(0.4, 0, 0.2, 1)';
+            circle.style.strokeDashoffset = offset;
+        }, 100);
+
+        let start = 0;
+        let duration = 2000;
+        let startTime = null;
+
+        function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            let progress = Math.min((timestamp - startTime) / duration, 1);
+            numberDisplay.innerText = Math.floor(progress * targetPercent);
+            if (progress < 1) window.requestAnimationFrame(step);
+        }
+        window.requestAnimationFrame(step);
+    }
+
+    animateConfidence({{ confidence }});
+</script>
+{% endif %}
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('mainForm').onsubmit = () => {
+            document.getElementById('predictBtn').innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Analyzing Patterns...';
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>AI Job Shield | Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="auth-page">
+    <div class="auth-wrapper">
+        <div class="glass-card" style="max-width: 400px; width: 90%; text-align: center;">
+            <div class="icon-circle" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert" style="background: rgba(255, 71, 87, 0.2); border: 1px solid var(--fake); padding: 10px; border-radius: 8px; margin-bottom: 1rem; color: #ff8a95;">
+                        {{ messages[0] }}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% if mode == 'login' %}
+                <h2 style="margin-bottom: 0.5rem;">Admin Access</h2>
+                <p style="color: #94a3b8; margin-bottom: 2rem;">Login to view system intelligence.</p>
+                <form action="/login" method="POST">
+                    <input type="text" name="username" placeholder="Username" style="width: 100%; padding: 12px; margin-bottom: 1rem; background: rgba(0,0,0,0.2); border: 1px solid #334155; border-radius: 8px; color: white;" required>
+                    <input type="password" name="password" placeholder="Password" style="width: 100%; padding: 12px; margin-bottom: 1.5rem; background: rgba(0,0,0,0.2); border: 1px solid #334155; border-radius: 8px; color: white;" required>
+                    <button type="submit" class="glow-btn" style="width: 100%;">Enter Dashboard</button>
+                </form>
+                <p style="margin-top: 1.5rem; font-size: 0.9rem;">New Officer? <a href="/register" style="color: var(--primary); text-decoration: none;">Register</a></p>
+            {% else %}
+                <h2>Initialize Account</h2>
+                <form action="/register" method="POST">
+                    <input type="text" name="username" placeholder="Choose Username" style="width: 100%; padding: 12px; margin-bottom: 1rem; background: rgba(0,0,0,0.2); border: 1px solid #334155; border-radius: 8px; color: white;" required>
+                    <input type="password" name="password" placeholder="Secure Password" style="width: 100%; padding: 12px; margin-bottom: 1.5rem; background: rgba(0,0,0,0.2); border: 1px solid #334155; border-radius: 8px; color: white;" required>
+                    <button type="submit" class="glow-btn" style="width: 100%;">Create Account</button>
+                </form>
+                <p style="margin-top: 1.5rem; font-size: 0.9rem;">Already registered? <a href="/login" style="color: var(--primary); text-decoration: none;">Login</a></p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

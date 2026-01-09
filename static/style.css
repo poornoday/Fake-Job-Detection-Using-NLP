@@ -1,0 +1,214 @@
+/* Custom Variables */
+:root {
+    --primary: #6366f1;
+    --accent: #a855f7;
+    --fake: #ff4757;
+    --real: #2ed573;
+    --bg-dark: #0f172a;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+    color: #f8fafc;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Glassmorphism Effect */
+.glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    padding: 3rem;
+    transition: transform 0.3s ease;
+}
+
+/* Centering Logic for Login */
+.auth-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Glowing Buttons */
+.glow-btn {
+    background: linear-gradient(45deg, var(--primary), var(--accent));
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.glow-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4);
+}
+
+/* Result Feedback */
+.result-card {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border-radius: 16px;
+    animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.result-card.fake { border: 2px solid var(--fake); background: rgba(255, 71, 87, 0.1); box-shadow: 0 0 20px rgba(255, 71, 87, 0.2); }
+.result-card.real { border: 2px solid var(--real); background: rgba(46, 213, 115, 0.1); box-shadow: 0 0 20px rgba(46, 213, 115, 0.2); }
+
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.charts-row {
+    display: flex;
+    flex-wrap: wrap; /* Makes it responsive on smaller screens */
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+    .charts-row {
+        flex-direction: column;
+    }
+}
+/* Status Pulse Animation */
+.status-pulse {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 0 rgba(34, 197, 94, 0.4);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Spinner for retraining */
+.spinner { margin: 0 auto; }
+.chart-container {
+    position: relative;
+    height: 300px;
+}
+
+/* Optional: Putting a label inside the doughnut */
+.chart-center-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+}
+
+.chart-center-label span {
+    display: block;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.chart-center-label strong {
+    font-size: 1.5rem;
+    color: white;
+}
+canvas#distributionChart {
+    filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.2));
+    transition: all 0.5s ease;
+}
+
+.chart-container:hover canvas#distributionChart {
+    filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.4));
+}
+
+/* Optional: Add a spinning border around the chart container */
+.chart-wrapper {
+    position: relative;
+    padding: 10px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+}
+.ring-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin-right: 20px;
+}
+
+.progress-ring {
+    transform: rotate(-90deg); /* Start from the top */
+}
+
+.percentage-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+}
+
+/* Add a neon glow to the active ring */
+.result-display.fake #confidenceRing {
+    filter: drop-shadow(0 0 5px #ef4444);
+}
+
+.result-display.real #confidenceRing {
+    filter: drop-shadow(0 0 5px #22c55e);
+}
+
+.result-display {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 25px;
+}
+.btn-report {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn-report:hover {
+    background: #b91c1c;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.glass-input {
+    background: rgba(0,0,0,0.3);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 8px;
+    outline: none;
+}
+
+.flag-zone {
+    border-radius: 15px;
+    overflow: hidden;
+}

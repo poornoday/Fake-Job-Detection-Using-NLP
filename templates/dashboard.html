@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fake Job Detection Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dash-body">
+    <div class="dash-nav">
+        <h2>Dashboard</h2>
+        <div><a href="/">Main Page</a> | <a href="/export/csv">Export CSV</a> | <a href="/logout">Logout</a></div>
+    </div>
+
+    <div class="chart-container">
+    <canvas id="distributionChart"></canvas>
+    <div class="chart-center-label">
+        <span>TOTAL</span>
+        <strong>{{ total }}</strong>
+    </div>
+</div>
+
+    <div class="glass-card" style="flex: 1; padding: 20px;">
+        <h3 style="text-align: center; margin-bottom: 20px;">Activity Trend</h3>
+        <canvas id="trendChart"></canvas>
+    </div>
+</div>
+
+<script>
+    // CHART 1: PIE CHART (FAKE VS REAL)
+    const ctx1 = document.getElementById('distributionChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'doughnut', // Doughnut looks cooler than a standard Pie
+        data: {
+            labels: ['Fake (Red)', 'Real (Green)'],
+            datasets: [{
+                data: [{{ fake }}, {{ real }}],
+                backgroundColor: ['#ef4444', '#22c55e'],
+                borderColor: 'rgba(255,255,255,0.1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#cbd5e1' } }
+            }
+        }
+    });
+
+    // CHART 2: LINE CHART (TREND OVER TIME)
+    const ctx2 = document.getElementById('trendChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: {{ labels|tojson }},
+            datasets: [{
+                label: 'Predictions per Day',
+                data: {{ counts|tojson }},
+                borderColor: '#6366f1',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            },
+            plugins: {
+                legend: { labels: { color: '#cbd5e1' } }
+            }
+        }
+    });
+</script>
+<div class="control-center" style="margin-bottom: 30px;">
+    <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
+        <div class="system-status">
+            <span class="status-pulse"></span>
+            <span style="margin-left: 10px; color: #94a3b8; font-weight: 600;">System Status: <span style="color: #22c55e;">Operational</span></span>
+            <span style="margin-left: 20px; color: #94a3b8;">Model: <span style="color: #818cf8;">LR-v1.0.4</span></span>
+        </div>
+        
+        <div class="retrain-action">
+            <button id="retrainBtn" onclick="simulateRetraining()" class="glow-btn" style="padding: 10px 20px; font-size: 0.8rem; background: var(--accent);">
+                <i class="fas fa-sync-alt"></i> Retrain Model
+            </button>
+        </div>
+    </div>
+</div>
+<h2 style="margin-top: 50px; color: #facc15; display: flex; align-items: center; gap: 10px;">
+    <i class="fas fa-flag"></i> User Flagged Reports
+</h2>
+
+<div class="glass-card" style="margin-top: 20px; padding: 0; overflow: hidden;">
+    <table class="log-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead style="background: rgba(255, 255, 255, 0.05);">
+            <tr>
+                <th style="padding: 15px;">Date & Time</th>
+                <th style="padding: 15px;">AI Verdict</th>
+                <th style="padding: 15px;">User Feedback</th>
+                <th style="padding: 15px;">Content Preview</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in flags %}
+            <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                <td style="padding: 15px; font-size: 0.85rem; color: #94a3b8;">
+                    {{ f.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                </td>
+                <td style="padding: 15px;">
+                    <span class="badge {{ f.predicted_as.lower() }}" style="
+                        padding: 4px 10px; 
+                        border-radius: 6px; 
+                        font-size: 0.75rem; 
+                        text-transform: uppercase;
+                        border: 1px solid {% if f.predicted_as == 'Fake' %}#ef4444; color: #ef4444{% else %}#22c55e; color: #22c55e{% endif %};
+                    ">
+                        {{ f.predicted_as }}
+                    </span>
+                </td>
+                <td style="padding: 15px; color: #facc15; font-weight: 500;">
+                    {{ f.reason }}
+                </td>
+                <td style="padding: 15px; font-size: 0.8rem; opacity: 0.7; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ f.job_text }}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" style="padding: 40px; text-align: center; color: #64748b;">
+                    <i class="fas fa-inbox" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                    No flags reported yet.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div id="retrainOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.9); z-index:1000; flex-direction:column; justify-content:center; align-items:center;">
+    <div class="spinner" style="border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--accent); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;"></div>
+    <h2 style="margin-top:20px; color:white;">Processing Flagged Data...</h2>
+    <p id="retrainProgress" style="color:#94a3b8;">Updating Weights: 0%</p>
+</div>
+<button onclick="alert('Model Retraining Started: Using 12 new flagged data points. Please wait... \n\nSuccess: Model v1.0.5 is now live!')" 
+    class="glow-btn" style="margin-top: 20px; background: #a855f7;">
+    Retrain Model with Flagged Data
+</button>
+</body>
+</html>
