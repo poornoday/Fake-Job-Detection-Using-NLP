@@ -21,11 +21,9 @@ A machine learning & NLP-based web application that detects fraudulent job posti
 1. Create virtual environment
 2. Install dependencies
    pip install -r requirements.txt
-3. Run database
-   python init_db.py
-4. Start server
+3. Start server
    python app.py
-5. Open browser
+4. Open browser
    http://127.0.0.1:5000
 
 ## API Endpoints
@@ -36,3 +34,4 @@ A machine learning & NLP-based web application that detects fraudulent job posti
 
 ## Author
 Poornoday Sriram
+
