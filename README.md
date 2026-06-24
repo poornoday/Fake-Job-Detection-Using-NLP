@@ -33,5 +33,5 @@ A machine learning & NLP-based web application that detects fraudulent job posti
 - /
 
 ## Author
-Poornoday Sriram
+K Poornoday Sriram
 
